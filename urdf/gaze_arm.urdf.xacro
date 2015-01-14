@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gaze_arm">
+  <link name="world" />
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+  <xacro:property name="pi" value="3.1415926535897931" />
+  <xacro:macro name="default_inertial" params="mass origin_xyz">
+    <inertial>
+      <mass value="${mass}" />
+      <origin xyz="${origin_xyz}" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                         iyy="1.0" iyz="0.0"
+                                   izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.044" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.015" length="0.088" />
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 .8 1" />
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.044" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.015" length="0.088" />
+      </geometry>
+    </collision>
+
+    <xacro:default_inertial mass="0.03" origin_xyz="0 0 0.044" />
+  </link>
+  <gazebo reference="base_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="joint0" type="fixed">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0.088" rpy="0 ${pi/6.} 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <link name="link1">
+    <visual>
+      <origin xyz="0 0 0.035" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.01" length="0.065" />
+      </geometry>
+      <material name="blue" />
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.035" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.01" length="0.065" />
+      </geometry>
+    </collision>
+
+    <xacro:default_inertial mass="0.03" origin_xyz="0 0 0.035" />
+  </link>
+  <gazebo reference="link1">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <joint name="joint1" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 0.086" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-${pi/2.}" upper="${pi/2.}" effort="0.5293" velocity="6.159937255" />
+    <dynamics damping="0.4" />
+  </joint>
+  <transmission name="trans1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint1"> 
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+       <hardwareInterface>EffortJointInterface</hardwareInterface>
+       <mechanismReduction>1</mechanismReduction>
+    </actuator>
+  </transmission>
+
+  <link name="link2">
+    <visual>
+      <origin xyz="0 0 0.005" rpy="0 0 0" />
+      <geometry>
+        <box size="0.015 0.045 0.05" />
+      </geometry>
+      <material name="green">
+        <color rgba="0 .8 0 1" />
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.005" rpy="0 0 0" />
+      <geometry>
+        <box size="0.015 0.045 0.035" />
+      </geometry>
+    </collision>
+
+    <xacro:default_inertial mass="0.04" origin_xyz="0 0 0.005" />
+  </link>
+  <gazebo reference="link2">
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+  <joint name="joint2" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 0.06" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="-${pi/3.}" upper="${pi/3.}" effort="0.5293" velocity="6.159937255" />
+    <dynamics damping="0.4" />
+  </joint>
+  <transmission name="trans2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint2"> 
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+       <hardwareInterface>EffortJointInterface</hardwareInterface>
+       <mechanismReduction>1</mechanismReduction>
+    </actuator>
+  </transmission>
+
+  <link name="link3">
+    <visual>
+      <origin xyz="0 0 -0.005" rpy="0 0 0" />
+      <geometry>
+        <box size="0.045 0.015 0.05" />
+      </geometry>
+      <material name="orange">
+        <color rgba="1 .64 0 1" />
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 -0.005" rpy="0 0 0" />
+      <geometry>
+        <box size="0.045 0.015 0.05" />
+      </geometry>
+    </collision>
+
+    <xacro:default_inertial mass="0.04" origin_xyz="0 0 -0.005" />
+  </link>
+  <gazebo reference="link3">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="link3"/>
+    <child link="camera_link"/>
+    <origin xyz="0.015 0 0.025" rpy="0 0 0" />
+  </joint>
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0.0125" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 0.045 0.025" />
+      </geometry>
+      <material name="red">
+        <color rgba=".8 0 0 1" />
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.0125" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 0.045 0.025" />
+      </geometry>
+    </collision>
+
+    <xacro:default_inertial mass="0.04" origin_xyz="0 0 0.0125" />
+  </link>
+  <gazebo reference="camera_link">
+    <material>Gazebo/Red</material>
+    <sensor type="camera" name="tip_camera">
+      <update_rate>30.0</update_rate>
+      <camera name="tip_camera">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>500</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>gaze_arm/tip_camera</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/gaze_arm</robotNamespace>
+    </plugin>
+  </gazebo>
+
+</robot>
